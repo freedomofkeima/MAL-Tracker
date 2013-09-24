@@ -55,31 +55,22 @@ $current_url = "http://".$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
 </thead>
 <tbody>
 <?php
-
-function SortRank($file, $argc, $size, $param)
-{
-	#sort by param
-	for ($x = 0; $x < $size - 1; $x++)
-	 {
-	    $min = $x;
-		for ($y =$x+1 ; $y < $size; $y++)
-		{
-			if ($file[$min][$param] > $file[$y][$param])
-			   $min = $y;
+  $total_size = 0;
+  for ($x=0;$x<$nn;$x++) {
+     if ($csvarray[$x][3] != 0) {
+        for ($y=0;$y<$c;$y++) {
+			$csvarray_after[$total_size][$y] = $csvarray[$x][$y];
 		}
-		//swap
-		for ($y = 0; $y < $argc; $y++)
-		{
-			$temp = $file[$x][$y];
-			$file[$x][$y] = $file[$min][$y];
-			$file[$min][$y] = $temp;
-		}
-	 }
-	return $file;
-}
+       $total_size++;
+     }
+  }
+  
+  function cmp($a, $b) {
+    return $a[3]===$b[3] ? 0 : $a[3]>$b[3] ? 1 : -1;
+  }
+  
+  usort($csvarray_after, 'cmp');
 
-	
-$csvarray = SortRank($csvarray, $c, $nn, 3);
 # Print the File.
 $nomor = 0;
    $x1 = "G - All Ages";
@@ -100,17 +91,17 @@ if (isset($_POST['submit']))
    if ($_POST['box5'] == "0")
     $x5 = "";
  }
-for($x=0;$x<$nn;$x++)
+for($x=0;$x<$total_size;$x++)
 {
-  if (($csvarray[$x][2] == $x1) || ($csvarray[$x][2] == $x2) || ($csvarray[$x][2] == $x3) || ($csvarray[$x][2] == $x4) || ($csvarray[$x][2] == $x5))
+  if (($csvarray_after[$x][2] == $x1) || ($csvarray_after[$x][2] == $x2) || ($csvarray_after[$x][2] == $x3) || ($csvarray_after[$x][2] == $x4) || ($csvarray_after[$x][2] == $x5))
     {
 		echo "<tr>\n";
 		echo "<td>" . ($nomor+1) . "</td>\n";
 		$nomor = $nomor + 1;
-		$s = "http://myanimelist.net/anime/" . $csvarray[$x][0];
-		   echo"<td><a href={$s}>" . $csvarray[$x][0] . "</a></td>\n";
+		$s = "http://myanimelist.net/anime/" . $csvarray_after[$x][0];
+		   echo"<td><a href={$s}>" . $csvarray_after[$x][0] . "</a></td>\n";
 		for ($y = 1; $y < $c ; $y++)
-		  echo "<td>" . $csvarray[$x][$y] . "</td>\n";
+		  echo "<td>" . $csvarray_after[$x][$y] . "</td>\n";
 		echo "</tr>\n";
 	}
 }
